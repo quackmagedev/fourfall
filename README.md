@@ -20,6 +20,11 @@ core logic (.NET 8.0) with a Godot 4.6 (C#/mono) front end.
   - `scripts/Main.cs` — owns the `GameEngine`, rolls the weighted token queue, bridges input → engine turn → playback
   - `scripts/Hud.cs` — score/summary labels + next-token preview
 
+## Requirements
+
+- [Godot 4.6.1](https://godotengine.org/) with .NET / C# support
+- .NET 8 SDK
+
 ## Run verification
 
 ```
@@ -31,7 +36,8 @@ Exit code 0 = all checks passed.
 
 ## Build / run the game
 
-```
-dotnet build game/Fourfall.Game.sln
-"C:\Program Files\Godot\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64_console.exe" --path game
-```
+Open `game/project.godot` in Godot 4.6.1 and press F5, or build and run via the .NET CLI with `game/Fourfall.Game.sln`.
+
+## License
+
+Copyright (c) 2026 QuackMage. All rights reserved.
