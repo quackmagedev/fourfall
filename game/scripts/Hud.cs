@@ -11,6 +11,7 @@ public partial class Hud : CanvasLayer
     private Label _creditsLabel = null!;
     private Label _eventLabel = null!;
     private Label _nextKindLabel = null!;
+    private Label _nextHintLabel = null!;
     private Label _gameOverLabel = null!;
     private TokenView _nextPreview = null!;
 
@@ -23,6 +24,15 @@ public partial class Hud : CanvasLayer
         _nextKindLabel = GetNode<Label>("NextKindLabel");
         _gameOverLabel = GetNode<Label>("GameOverLabel");
         _nextPreview = GetNode<TokenView>("NextPreview");
+
+        _nextHintLabel = new Label();
+        _nextHintLabel.AddThemeFontSizeOverride("font_size", 15);
+        _nextHintLabel.AddThemeColorOverride("font_color", new Color("8b95ad"));
+        _nextHintLabel.SetPosition(new Vector2(980f, 168f));
+        _nextHintLabel.SetSize(new Vector2(260f, 80f));
+        _nextHintLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _nextHintLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        AddChild(_nextHintLabel);
     }
 
     public void ShowRun(RunState state, SectorHazard hazard)
@@ -48,5 +58,12 @@ public partial class Hud : CanvasLayer
         _nextKindLabel.Text = token.Kind == TokenKind.Standard
             ? token.Color.ToString()
             : $"{token.Color} {token.Kind}";
+        _nextHintLabel.Text = token.Kind switch
+        {
+            TokenKind.Iron   => "Destroys the token directly below on drop",
+            TokenKind.Glass  => "3× score — shatters at end of turn if unmatched",
+            TokenKind.Drain  => "Removes the bottom token of the column on drop",
+            _                => "",
+        };
     }
 }

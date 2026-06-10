@@ -179,18 +179,34 @@ public partial class Main : Node2D
                 return $"Attachment bonus +{result.AttachmentFlatBonus}.";
             }
 
-            return result.GlassShattered > 0
-                ? $"{result.GlassShattered} glass token(s) shattered."
-                : "No matches.";
+            if (result.GlassShattered > 0)
+            {
+                return $"{result.GlassShattered} glass token(s) shattered — no match, no points.";
+            }
+
+            return "No matches.";
         }
 
-        string summary =
-            $"{result.CascadeWaves} wave(s), peak x{result.PeakMultiplier:0.##}, +{result.TotalScore}";
+        var parts = new System.Collections.Generic.List<string>();
+        parts.Add($"{result.CascadeWaves} wave(s)");
+        parts.Add($"peak ×{result.PeakMultiplier:0.##}");
+        parts.Add($"+{result.TotalScore}");
+
+        if (result.DiversityBonusWaves > 0)
+        {
+            parts.Add($"{result.DiversityBonusWaves} diversity bonus(es) — new colors in a cascade grow the multiplier faster");
+        }
+
         if (result.GlassShattered > 0)
         {
-            summary += $"  ({result.GlassShattered} glass shattered)";
+            parts.Add($"{result.GlassShattered} glass shattered");
         }
 
-        return summary;
+        if (result.DebrisPlaced > 0)
+        {
+            parts.Add($"{result.DebrisPlaced} debris block(s) spawned from vertical match — diagonal/horizontal matches avoid this");
+        }
+
+        return string.Join("  ·  ", parts);
     }
 }
