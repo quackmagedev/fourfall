@@ -67,6 +67,14 @@ public partial class TokenView : Node2D
 
                 break;
 
+            case TokenKind.Debris:
+                // Soft rubble: muted gray-brown slab with a crack, no match color.
+                DrawCircle(Vector2.Zero, Radius, new Color("5a4e42"));
+                DrawArc(Vector2.Zero, Radius - 3f, 0f, Mathf.Tau, 48, new Color("3b3028"), 5f);
+                DrawLine(new Vector2(-8f, -16f), new Vector2(4f, 0f), new Color("2a2018"), 2.5f);
+                DrawLine(new Vector2(4f, 0f), new Vector2(-2f, 16f), new Color("2a2018"), 2.5f);
+                break;
+
             case TokenKind.Drain:
                 // Full body with a dark down-arrow stamped in the middle.
                 DrawCircle(Vector2.Zero, Radius, body);
