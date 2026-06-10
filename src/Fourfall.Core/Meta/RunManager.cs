@@ -69,6 +69,20 @@ public sealed class RunManager
         return result;
     }
 
+    /// <summary>Debug helper: immediately satisfies the current Quota and opens the shop.</summary>
+    public void ForceCompleteQuota()
+    {
+        if (State.Phase != RunPhase.Quota)
+        {
+            return;
+        }
+
+        State.QuotaScore = State.QuotaTarget;
+        State.QuotasCleared++;
+        State.Phase = RunPhase.Shop;
+        Terminal = RequisitionTerminal.OpenFor(State);
+    }
+
     /// <summary>Buys from the open terminal. False when closed, sold, or unaffordable.</summary>
     public bool TryPurchase(int offerIndex) =>
         Terminal is not null && Terminal.TryPurchase(offerIndex, State);

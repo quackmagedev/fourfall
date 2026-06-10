@@ -36,6 +36,24 @@ public partial class Main : Node2D
         {
             StartRun();
         }
+
+        if (@event is InputEventKey { Pressed: true, Keycode: Key.F1 })
+        {
+            DebugSkipQuota();
+        }
+    }
+
+    private void DebugSkipQuota()
+    {
+        if (_turnInFlight || _run.State.Phase != RunPhase.Quota)
+        {
+            return;
+        }
+
+        _run.ForceCompleteQuota();
+        _hud.ShowQuota(_run.State);
+        AudioManager.Instance?.PlayQuotaCleared();
+        _shop.Open(_run.Terminal!, _run.State, ShopContextLine());
     }
 
     private void StartRun()
