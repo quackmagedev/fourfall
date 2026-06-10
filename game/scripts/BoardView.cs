@@ -157,6 +157,23 @@ public partial class BoardView : Node2D
                 EmitSignal(SignalName.ColumnSelected, column);
             }
         }
+        else if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right })
+        {
+            AudioManager.Instance?.PlayClick();
+            EmitSignal(SignalName.ColumnSelected, _hoverColumn);
+        }
+        else if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.WheelUp })
+        {
+            _hoverColumn = Mathf.PosMod(_hoverColumn + 1, Board.Columns);
+            QueueRedraw();
+            AudioManager.Instance?.PlayHover();
+        }
+        else if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.WheelDown })
+        {
+            _hoverColumn = Mathf.PosMod(_hoverColumn - 1, Board.Columns);
+            QueueRedraw();
+            AudioManager.Instance?.PlayHover();
+        }
         else if (@event.IsActionPressed("ui_left"))
         {
             _hoverColumn = Mathf.PosMod(_hoverColumn - 1, Board.Columns);
