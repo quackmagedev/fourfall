@@ -24,10 +24,17 @@ public partial class AudioManager : Node
     private AudioStreamPlayer _shopClose      = null!;
     private AudioStreamPlayer _sectorAdvance  = null!;
     private AudioStreamPlayer _gameOver       = null!;
+    private AudioStreamPlayer _music          = null!;
 
     public override void _Ready()
     {
         Instance = this;
+
+        var musicStream = GD.Load<AudioStreamMP3>("res://assets/audio/dark-factory-sequence.mp3");
+        musicStream.Loop = true;
+        _music = new AudioStreamPlayer { Stream = musicStream, VolumeDb = -6f };
+        AddChild(_music);
+        _music.Play();
 
         _tokenLandSoft  = Make("res://assets/audio/impactSoft_medium_000.ogg");
         _tokenLandMetal = Make("res://assets/audio/impactMetal_heavy_000.ogg");
