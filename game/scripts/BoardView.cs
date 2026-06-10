@@ -145,6 +145,7 @@ public partial class BoardView : Node2D
             {
                 _hoverColumn = column;
                 QueueRedraw();
+                AudioManager.Instance?.PlayHover();
             }
         }
         else if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
@@ -152,6 +153,7 @@ public partial class BoardView : Node2D
             int column = ColumnAt(GetLocalMousePosition());
             if (column >= 0)
             {
+                AudioManager.Instance?.PlayClick();
                 EmitSignal(SignalName.ColumnSelected, column);
             }
         }
@@ -159,14 +161,17 @@ public partial class BoardView : Node2D
         {
             _hoverColumn = Mathf.PosMod(_hoverColumn - 1, Board.Columns);
             QueueRedraw();
+            AudioManager.Instance?.PlayHover();
         }
         else if (@event.IsActionPressed("ui_right"))
         {
             _hoverColumn = Mathf.PosMod(_hoverColumn + 1, Board.Columns);
             QueueRedraw();
+            AudioManager.Instance?.PlayHover();
         }
         else if (@event.IsActionPressed("ui_accept"))
         {
+            AudioManager.Instance?.PlayClick();
             EmitSignal(SignalName.ColumnSelected, _hoverColumn);
         }
     }
@@ -197,14 +202,27 @@ public partial class BoardView : Node2D
                     break;
 
                 case TurnStepKind.ClearWave:
+                    AudioManager.Instance?.PlayClearWave(step.WaveNumber);
                     SpawnScorePopup(step);
                     await PlayRemovalsAndSlidesAsync(step);
                     await PauseAsync(InterWavePause);
                     break;
 
                 case TurnStepKind.DropEffect:
-                case TurnStepKind.GlassShatter:
+                    AudioManager.Instance?.PlayDropEffect();
                     await PlayRemovalsAndSlidesAsync(step);
+                    break;
+
+                case TurnStepKind.GlassShatter:
+                    AudioManager.Instance?.PlayGlassShatter();
+                    await PlayRemovalsAndSlidesAsync(step);
+                    break;
+
+                case TurnStepKind.DebrisSettle:
+                    foreach ((int col, int row, Token token) in step.PlacedCells)
+                        SpawnStatic(token, col, row);
+                    if (step.PlacedCells.Count > 0)
+                        AudioManager.Instance?.PlayTokenLand(step.PlacedCells[0].Token);
                     break;
             }
         }
@@ -233,6 +251,8 @@ public partial class BoardView : Node2D
         tween.TweenProperty(view, "position:y", target.Y, 0.08f + fallRows * SlideDurationPerRow)
             .SetTrans(Tween.TransitionType.Quad)
             .SetEase(Tween.EaseType.In);
+        Token landed = step.SettledToken!;
+        tween.TweenCallback(Callable.From(() => AudioManager.Instance?.PlayTokenLand(landed)));
         tween.TweenProperty(view, "scale", new Vector2(1.15f, 0.85f), 0.05f);
         tween.TweenProperty(view, "scale", Vector2.One, 0.09f)
             .SetTrans(Tween.TransitionType.Back)

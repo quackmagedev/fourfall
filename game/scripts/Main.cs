@@ -75,6 +75,7 @@ public partial class Main : Node2D
             TurnResult result = _run.PlayTurn(column);
             if (result.Rejected)
             {
+                AudioManager.Instance?.PlayRejection();
                 _hud.ShowEvent(_run.Engine.Board.IsColumnJammed(column)
                     ? $"Column {column + 1} is jammed shut."
                     : $"Column {column + 1} is full.");
@@ -93,10 +94,12 @@ public partial class Main : Node2D
             switch (_run.State.Phase)
             {
                 case RunPhase.Shop:
+                    AudioManager.Instance?.PlayQuotaCleared();
                     _shop.Open(_run.Terminal!, _run.State, ShopContextLine());
                     break;
 
                 case RunPhase.GameOver:
+                    AudioManager.Instance?.PlayGameOver();
                     _hud.ShowGameOver(true);
                     _hud.ShowEvent("The board locked out below quota. Press Enter to restart the shift.");
                     break;
@@ -117,10 +120,12 @@ public partial class Main : Node2D
 
         if (!_run.TryPurchase(index))
         {
+            AudioManager.Instance?.PlayPurchaseDenied();
             _hud.ShowEvent("Requisition denied: insufficient credits.");
             return;
         }
 
+        AudioManager.Instance?.PlayPurchase();
         _hud.ShowCredits(_run.State.Credits);
         _shop.Refresh(_run.Terminal, _run.State, ShopContextLine());
     }
@@ -132,8 +137,15 @@ public partial class Main : Node2D
             return;
         }
 
+        int sectorBefore = _run.State.Sector;
         _shop.Close();
         _run.CloseShop();
+
+        if (_run.State.Sector > sectorBefore)
+            AudioManager.Instance?.PlaySectorAdvance();
+        else
+            AudioManager.Instance?.PlayShopClose();
+
         BeginQuota();
     }
 
